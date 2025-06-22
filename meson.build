@@ -83,6 +83,7 @@ py.extension_module(
     '_libcamera',
     pycamera_sources,
     install : true,
+    install_rpath : ['$ORIGIN'],
     subdir : 'libcamera',
     dependencies : pycamera_deps,
     include_directories : libcamera_includes,
