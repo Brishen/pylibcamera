@@ -17,9 +17,9 @@ Source = "https://github.com/raspberrypi/pylibcamera"
 
 [tool.meson-python.args]
 setup = [
-    '-Drevision=main',
+    '-Drevision=v0.5.0',
     '-Drepository=https://github.com/Brishen/libcamera.git',
-#    '-Dversion=v0.5.0+59-d83ff0a4',
+    '-Dversion=v0.5.0',
 #    '-Dpatch=fix_libcamera_again5'
 ]
 
