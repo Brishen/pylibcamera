@@ -21,7 +21,7 @@ run_command('clone-libcamera.sh', get_option('repository'), get_option('revision
 libcamera_proj = subproject(
     'libcamera',
     default_options : [
-        'pycamera=disabled',
+        'pycamera=enabled',
         'documentation=disabled',
         'test=false',
         'lc-apps=disabled',
