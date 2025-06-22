@@ -21,14 +21,13 @@ run_command('clone-libcamera.sh', get_option('repository'), get_option('revision
 libcamera_proj = subproject(
     'libcamera',
     default_options : [
-        'test=false',
-        'pycamera=enabled',
-        'v4l2=enabled',
+        'pycamera=disabled',
         'documentation=disabled',
-        'test=disabled',
+        'test=false',
         'lc-apps=disabled',
         'qcam=disabled',
         'gstreamer=enabled',
+        'v4l2=enabled',
     ]
 )
 libcamera_private = libcamera_proj.get_variable('libcamera_private')
