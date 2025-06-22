@@ -1,11 +1,13 @@
 #!/bin/bash
 
 rm -rf libcamera
+rm -rf subprojects/libcamera
+mkdir -p subprojects
 
-git clone $1 libcamera
-pushd libcamera
+git clone $1 subprojects/libcamera
+pushd subprojects/libcamera
 
 git checkout $2
-git apply ../$3.patch
+git apply ../../$3.patch
 
 popd

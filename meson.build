@@ -33,32 +33,36 @@ libcamera_proj = subproject(
     ]
 )
 libcamera_private = libcamera_proj.get_variable('libcamera_private')
+libcamera_source_root = libcamera_proj.source_root()
 
-libcamera_includes = include_directories('libcamera/include', 'libcamera/src/py/libcamera')
+libcamera_includes = include_directories(
+    join_paths(libcamera_source_root, 'include'),
+    join_paths(libcamera_source_root, 'src/py/libcamera')
+)
 
 # Sub-directories fill py_modules with their dependencies.
 py_modules = []
-subdir('libcamera/utils/codegen')
+subdir(join_paths(libcamera_source_root, 'utils/codegen'))
 
 py = import('python').find_installation(modules : py_modules)
 
 controls_files = [
-    files('libcamera/src/libcamera/control_ids_core.yaml'),
-    files('libcamera/src/libcamera/control_ids_draft.yaml'),
-    files('libcamera/src/libcamera/control_ids_rpi.yaml'),
+    files(join_paths(libcamera_source_root, 'src/libcamera/control_ids_core.yaml')),
+    files(join_paths(libcamera_source_root, 'src/libcamera/control_ids_draft.yaml')),
+    files(join_paths(libcamera_source_root, 'src/libcamera/control_ids_rpi.yaml')),
 ]
 
 properties_files = [
-    files('libcamera/src/libcamera/property_ids_core.yaml'),
-    files('libcamera/src/libcamera/property_ids_draft.yaml'),
+    files(join_paths(libcamera_source_root, 'src/libcamera/property_ids_core.yaml')),
+    files(join_paths(libcamera_source_root, 'src/libcamera/property_ids_draft.yaml')),
 ]
 
-subdir('libcamera/src/py')
+subdir(join_paths(libcamera_source_root, 'src/py'))
 
 message('Using python version @0@ from @1@'.format(py.version(), py.full_path()))
 
 py.install_sources(
-    'libcamera/src/py/libcamera/__init__.py',
+    join_paths(libcamera_source_root, 'src/py/libcamera/__init__.py'),
     subdir : 'libcamera',
     pure : false,
 )
