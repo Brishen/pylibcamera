@@ -13,13 +13,13 @@ option('repository',
 option('revision',
         type : 'string',
         value : 'main',
-        value: 'v0.5.1',
+        value: 'main',
         description : 'Git revision to checkout')
 
 option('version',
         type : 'string',
-#        value : 'unknown',
-        value: 'v0.5.1',
+        value : 'unknown',
+#        value: 'v0.5.1',
         description : 'libcamera version')
 
 #option('patch',
