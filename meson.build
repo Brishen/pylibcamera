@@ -28,6 +28,9 @@ libcamera_proj = subproject(
         'qcam=disabled',
         'gstreamer=enabled',
         'v4l2=enabled',
+        'udev=enabled',
+        'yaml=enabled',
+        'lttng=enabled'
     ]
 )
 libcamera_private = libcamera_proj.get_variable('libcamera_private')
