@@ -7,6 +7,9 @@ name = 'rpi-libcamera'
 version = '0.1a10'
 description = 'libcamera python bindings'
 readme = 'README.md'
+dependencies = [
+    "meson>=1.8.2",
+]
 
 [project.urls]
 Source = "https://github.com/raspberrypi/pylibcamera"
@@ -16,7 +19,8 @@ Source = "https://github.com/raspberrypi/pylibcamera"
 setup = [
     '-Drevision=v0.5.0+rpt20250429',
     '-Drepository=https://github.com/raspberrypi/libcamera.git',
-    '-Dversion=v0.5.0+59-d83ff0a4'
+    '-Dversion=v0.5.0+59-d83ff0a4',
+    '-Dpatch=fix_libcamera_again5'
 ]
 
 [tool.flit.module]

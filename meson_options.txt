@@ -24,7 +24,7 @@ option('version',
 
 option('patch',
         type : 'string',
-        value : 'pypatch',
+        value : 'fix_libcamera_again5',
         description : 'Patch to apply')
 
 option('pycamera',

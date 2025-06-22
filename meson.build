@@ -15,7 +15,7 @@ if not get_option('pycamera').enabled()
 endif
 
 message('Cloning from: @0@, revision @1@'.format(get_option('repository'), get_option('revision')))
-
+message('Applying patch: @0@'.format(get_option('patch')))
 run_command('clone-libcamera.sh', get_option('repository'), get_option('revision'), get_option('patch'), check : true)
 
 libcamera_proj = subproject(
@@ -39,31 +39,45 @@ libcamera_includes = include_directories(
 )
 
 # Sub-directories fill py_modules with their dependencies.
-py_modules = []
-subdir(join_paths(libcamera_source_root, 'utils/codegen'))
+#py_modules = []
+#subdir(join_paths(libcamera_source_root, 'utils/codegen'))
 
-py = import('python').find_installation(modules : py_modules)
+# grab the py_modules list that libcamera itself populated
+py_modules = libcamera_proj.get_variable('py_modules')
 
-controls_files = [
-    files(join_paths(libcamera_source_root, 'src/libcamera/control_ids_core.yaml')),
-    files(join_paths(libcamera_source_root, 'src/libcamera/control_ids_draft.yaml')),
-    files(join_paths(libcamera_source_root, 'src/libcamera/control_ids_rpi.yaml')),
-]
+py = import('python').find_installation(modules : py_modules, pure : false)
 
-properties_files = [
-    files(join_paths(libcamera_source_root, 'src/libcamera/property_ids_core.yaml')),
-    files(join_paths(libcamera_source_root, 'src/libcamera/property_ids_draft.yaml')),
-]
+#controls_files = [
+#    files(join_paths(libcamera_source_root, 'src/libcamera/control_ids_core.yaml')),
+#    files(join_paths(libcamera_source_root, 'src/libcamera/control_ids_draft.yaml')),
+#    files(join_paths(libcamera_source_root, 'src/libcamera/control_ids_rpi.yaml')),
+#]
 
-subdir(join_paths(libcamera_source_root, 'src/py'))
+#properties_files = [
+#    files(join_paths(libcamera_source_root, 'src/libcamera/property_ids_core.yaml')),
+#    files(join_paths(libcamera_source_root, 'src/libcamera/property_ids_draft.yaml')),
+#]
+
+controls_files   = libcamera_proj.get_variable('controls_files')
+properties_files = libcamera_proj.get_variable('properties_files')
+
+#subdir(join_paths(libcamera_source_root, 'src/py'))
+
+# grab the list that libcamera defined in
+# subprojects/libcamera/src/py/libcamera/meson.build
+pycamera_sources = libcamera_proj.get_variable('pycamera_sources')
+pycamera_deps    = libcamera_proj.get_variable('pycamera_deps')
+pycamera_args    = libcamera_proj.get_variable('pycamera_args')
+py_build_env     = libcamera_proj.get_variable('py_build_env')
+py_modules       = libcamera_proj.get_variable('py_modules')
 
 message('Using python version @0@ from @1@'.format(py.version(), py.full_path()))
 
-py.install_sources(
-    join_paths(libcamera_source_root, 'src/py/libcamera/__init__.py'),
-    subdir : 'libcamera',
-    pure : false,
-)
+# py.install_sources(
+#    join_paths(libcamera_source_root, 'src/py/libcamera/__init__.py'),
+#    subdir : 'libcamera',
+#    pure : false,
+#)
 
 py.extension_module(
     '_libcamera',
