@@ -8,6 +8,6 @@ git clone "$1" subprojects/libcamera
 pushd subprojects/libcamera || exit
 
 git checkout "$2"
-git apply ../../"$3".patch
+#git apply ../../"$3".patch
 
 popd || exit

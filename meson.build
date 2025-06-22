@@ -15,8 +15,8 @@ if not get_option('pycamera').enabled()
 endif
 
 message('Cloning from: @0@, revision @1@'.format(get_option('repository'), get_option('revision')))
-message('Applying patch: @0@'.format(get_option('patch')))
-run_command('clone-libcamera.sh', get_option('repository'), get_option('revision'), get_option('patch'), check : true)
+#message('Applying patch: @0@'.format(get_option('patch')))
+run_command('clone-libcamera.sh', get_option('repository'), get_option('revision'), check : true)
 
 libcamera_proj = subproject(
     'libcamera',

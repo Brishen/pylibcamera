@@ -22,10 +22,10 @@ option('version',
         # value: 'v0.5.0+59-d83ff0a4',
         description : 'libcamera version')
 
-option('patch',
-        type : 'string',
-        value : 'fix_libcamera_again5',
-        description : 'Patch to apply')
+#option('patch',
+#        type : 'string',
+#        value : 'fix_libcamera_again5',
+#        description : 'Patch to apply')
 
 option('pycamera',
         type : 'feature',
