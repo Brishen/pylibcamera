@@ -18,22 +18,23 @@ message('Cloning from: @0@, revision @1@'.format(get_option('repository'), get_o
 
 run_command('clone-libcamera.sh', get_option('repository'), get_option('revision'), get_option('patch'), check : true)
 
-r = run_command('check-version.sh', capture : true, check : false)
-if r.returncode() == 0 and get_option('version') != 'unknown'
-    version = r.stdout()
-    message('libcamera version is @0@'.format(version))
-    if version.strip() != get_option('version').strip()
-        error('This package works with libcamera version @0@, but you have version @1@ installed. Please check the readme for help with this error'.format(get_option('version'), version))
-    endif
-else
-    message('Version Check Not Done')
-endif
+libcamera_proj = subproject(
+    'libcamera',
+    default_options : [
+        'pycamera=disabled',
+        'documentation=disabled',
+        'test=disabled',
+        'lc-apps=disabled',
+        'qcam=disabled',
+        'gstreamer=disabled',
+        'pipewire=disabled',
+        'android=disabled',
+        'java=disabled',
+    ]
+)
+libcamera_private = libcamera_proj.get_variable('libcamera_private')
 
 libcamera_includes = include_directories('libcamera/include', 'libcamera/src/py/libcamera')
-libcamera_private = dependency(
-    'libcamera', required : true,
-    not_found_message : 'Requires libcamera-dev package to be installed - apt install libcamera-dev'
-)
 
 # Sub-directories fill py_modules with their dependencies.
 py_modules = []
