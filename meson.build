@@ -21,7 +21,7 @@ run_command('clone-libcamera.sh', get_option('repository'), get_option('revision
 libcamera_proj = subproject(
     'libcamera',
     default_options : [
-        'pycamera=enabled',
+        'pycamera=disabled',
         'documentation=disabled',
         'test=false',
         'lc-apps=disabled',
@@ -31,7 +31,7 @@ libcamera_proj = subproject(
     ]
 )
 libcamera_private = libcamera_proj.get_variable('libcamera_private')
-libcamera_source_root = libcamera_proj.source_root()
+libcamera_source_root = 'subprojects/libcamera'
 
 libcamera_includes = include_directories(
     join_paths(libcamera_source_root, 'include'),
