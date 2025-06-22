@@ -18,7 +18,7 @@ option('revision',
 
 option('version',
         type : 'string',
-        value : 'unknown',
+#        value : 'unknown',
         value: 'v0.5.1',
         description : 'libcamera version')
 
