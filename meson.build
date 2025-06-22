@@ -14,9 +14,9 @@ if not get_option('pycamera').enabled()
     error('pycamera must be enabled')
 endif
 
-message('Cloning from: @0@, revision @1@'.format(get_option('repository'), get_option('revision')))
+# message('Cloning from: @0@, revision @1@'.format(get_option('repository'), get_option('revision')))
 #message('Applying patch: @0@'.format(get_option('patch')))
-run_command('clone-libcamera.sh', get_option('repository'), get_option('revision'), check : true)
+# run_command('clone-libcamera.sh', get_option('repository'), get_option('revision'), check : true)
 
 libcamera_proj = subproject(
     'libcamera',
@@ -45,7 +45,8 @@ libcamera_includes = include_directories(
 # grab the py_modules list that libcamera itself populated
 py_modules = libcamera_proj.get_variable('py_modules')
 
-py = import('python').find_installation(modules : py_modules, pure : false)
+py = import('python').find_installation(modules : py_modules, pure : false, required : true)
+python_dep = py.dependency()
 
 #controls_files = [
 #    files(join_paths(libcamera_source_root, 'src/libcamera/control_ids_core.yaml')),
@@ -85,7 +86,7 @@ py.extension_module(
     install : true,
     install_rpath : '$ORIGIN',
     subdir : 'libcamera',
-    dependencies : pycamera_deps,
-    include_directories : libcamera_includes,
-    cpp_args : pycamera_args,
+    dependencies   : [ python_dep ] + pycamera_deps,
+    include_directories: libcamera_includes,
+    cpp_args           : pycamera_args,
 )
