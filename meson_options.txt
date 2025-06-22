@@ -7,13 +7,13 @@
 
 option('repository',
         type : 'string',
-        value : 'https://github.com/raspberrypi/libcamera.git',
+        value : 'https://github.com/Brishen/libcamera.git',
         description : 'Base repository to build from')
 
 option('revision',
         type : 'string',
-        # value : 'master',
-        value: 'v0.5.0+rpt20250429',
+        value : 'main',
+        # value: 'v0.5.0+rpt20250429',
         description : 'Git revision to checkout')
 
 option('version',
