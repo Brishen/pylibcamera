@@ -82,7 +82,6 @@ message('Using python version @0@ from @1@'.format(py.version(), py.full_path())
 #    subdir : 'libcamera',
 #    pure : false,
 #)
-libcamera_tgt = libcamera_proj.get_variable('libcamera')
 
 py.extension_module(
     '_libcamera',
@@ -90,7 +89,6 @@ py.extension_module(
     install : true,
     install_rpath : '$ORIGIN',
     subdir : 'libcamera',
-    link_with     : [ libcamera_tgt ],
     dependencies   : [ python_dep ] + pycamera_deps,
     include_directories: libcamera_includes,
     cpp_args           : pycamera_args,
