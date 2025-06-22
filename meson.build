@@ -21,6 +21,7 @@ endif
 libcamera_proj = subproject(
     'libcamera',
     default_options : [
+        'default_library=shared',
         'pycamera=enabled',
         'documentation=disabled',
         'test=false',
