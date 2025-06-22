@@ -1,4 +1,5 @@
 [wrap-git]
+directory = libcamera
 url = https://github.com/Brishen/libcamera.git
 revision = main
 depth = 1
