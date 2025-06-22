@@ -1,0 +1,163 @@
+Subject: [PATCH] fix libcamera again5
+---
+Index: src/meson.build
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/meson.build b/src/meson.build
+--- a/src/meson.build	(revision d83ff0a4ae4503bc56b7ed48cd142c3dd423ad3b)
++++ b/src/meson.build	(date 1750561735732)
+@@ -1,10 +1,24 @@
+ # SPDX-License-Identifier: CC0-1.0
+ 
+-# Cache system paths
+-libcamera_datadir = get_option('datadir') / 'libcamera'
+-libcamera_libdir = get_option('libdir') / 'libcamera'
+-libcamera_libexecdir = get_option('libexecdir') / 'libcamera'
+-libcamera_sysconfdir = get_option('sysconfdir') / 'libcamera'
++# Try to see if we’re under meson-python (i.e. building a wheel).
++python_mod = import('python')
++py_backend = python_mod.find_installation('python3', required : false, pure : false)
++if py_backend.found()
++    # All “data/lib/sysconf” dirs live under the Python package
++    pkgdir            = py_backend.get_install_dir() / 'libcamera'
++    libcamera_datadir    = pkgdir
++    libcamera_libdir     = pkgdir
++    libcamera_libexecdir = pkgdir
++    libcamera_sysconfdir = pkgdir
++else
++    # Normal system‐wide install
++    libcamera_datadir    = get_option('datadir')    / 'libcamera'
++    libcamera_libdir     = get_option('libdir')     / 'libcamera'
++    libcamera_libexecdir = get_option('libexecdir') / 'libcamera'
++    libcamera_sysconfdir = get_option('sysconfdir') / 'libcamera'
++endif
++
++
+ 
+ config_h.set('LIBCAMERA_DATA_DIR', '"' + get_option('prefix') / libcamera_datadir + '"')
+ config_h.set('LIBCAMERA_SYSCONF_DIR', '"' + get_option('prefix') / libcamera_sysconfdir + '"')
+Index: src/py/libcamera/meson.build
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/py/libcamera/meson.build b/src/py/libcamera/meson.build
+--- a/src/py/libcamera/meson.build	(revision d83ff0a4ae4503bc56b7ed48cd142c3dd423ad3b)
++++ b/src/py/libcamera/meson.build	(date 1750561469120)
+@@ -1,6 +1,8 @@
+ # SPDX-License-Identifier: CC0-1.0
+ 
+-py3_dep = dependency('python3', required : get_option('pycamera'))
++
++py = import('python').find_installation('python3', required : get_option('pycamera'), pure : false)
++py3_dep = py.dependency(required : get_option('pycamera'))
+ 
+ if not py3_dep.found()
+     pycamera_enabled = false
+@@ -69,7 +71,9 @@
+     '-fvisibility=hidden',
+     '-Wno-shadow',
+     '-DPYBIND11_USE_SMART_HOLDER_AS_DEFAULT',
++    '-DLIBCAMERA_BASE_PRIVATE',
+ ]
++subdir_done()
+ 
+ destdir = get_option('libdir') / ('python' + py3_dep.version()) / 'site-packages' / 'libcamera'
+ 
+@@ -85,18 +89,23 @@
+ # Create symlinks from the build dir to the source dir so that we can use the
+ # Python module directly from the build dir.
+ 
+-run_command('ln', '-fsrT', files('__init__.py'),
+-            meson.current_build_dir() / '__init__.py',
+-            check : true)
++#run_command('ln', '-fsrT', files('__init__.py'),
++#            meson.current_build_dir() / '__init__.py',
++#            check : true)
+ 
+-run_command('ln', '-fsrT', meson.current_source_dir() / 'utils',
+-            meson.current_build_dir() / 'utils',
+-            check : true)
++#run_command('ln', '-fsrT', meson.current_source_dir() / 'utils',
++#            meson.current_build_dir() / 'utils',
++#            check : true)
+ 
+ install_data(['__init__.py'],
+              install_dir : destdir,
+              install_tag : 'python-runtime')
+ 
++install_subdir(
++  'utils',
++  install_dir : destdir / 'utils',
++  install_tag : 'python-runtime'
++)
+ # \todo Generate stubs when building. See https://peps.python.org/pep-0484/#stub-files
+ # Note: Depends on pybind11-stubgen. To generate pylibcamera stubs:
+ # $ PYTHONPATH=build/src/py pybind11-stubgen --no-setup-py -o build/src/py libcamera
+Index: src/py/libcamera/py_helpers.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/py/libcamera/py_helpers.cpp b/src/py/libcamera/py_helpers.cpp
+--- a/src/py/libcamera/py_helpers.cpp	(revision d83ff0a4ae4503bc56b7ed48cd142c3dd423ad3b)
++++ b/src/py/libcamera/py_helpers.cpp	(date 1750561469120)
+@@ -25,7 +25,7 @@
+ 		for (size_t i = 0; i < cv.numElements(); ++i)
+ 			t[i] = v[i];
+ 
+-		return std::move(t);
++		return t;
+ 	}
+ 
+ 	return py::cast(cv.get<T>());
+Index: src/gstreamer/meson.build
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/gstreamer/meson.build b/src/gstreamer/meson.build
+--- a/src/gstreamer/meson.build	(revision d83ff0a4ae4503bc56b7ed48cd142c3dd423ad3b)
++++ b/src/gstreamer/meson.build	(date 1750561469120)
+@@ -49,12 +49,22 @@
+     libcamera_gst_cpp_args += ['-Wno-unused-function']
+ endif
+ 
++python = import('python')
++py = python.find_installation('python3', required : false, pure : false)
++
++if py.found()
++    # purelib might be e.g. /usr/lib/python3.10/site-packages
++    real_lib = py.get_install_dir()
++else
++    real_lib = get_option('libdir')
++endif
++
+ libcamera_gst = shared_library('gstlibcamera',
+     libcamera_gst_sources,
+     cpp_args : libcamera_gst_cpp_args,
+     dependencies : [libcamera_public, gstvideo_dep, gstallocator_dep],
+     install : true,
+-    install_dir : '@0@/gstreamer-1.0'.format(get_option('libdir')),
++    install_dir : real_lib / '..' / 'gstreamer-1.0',
+ )
+ 
+ # Make the plugin visible to GStreamer inside meson devenv.
+Index: src/libcamera/proxy/worker/meson.build
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/libcamera/proxy/worker/meson.build b/src/libcamera/proxy/worker/meson.build
+--- a/src/libcamera/proxy/worker/meson.build	(revision d83ff0a4ae4503bc56b7ed48cd142c3dd423ad3b)
++++ b/src/libcamera/proxy/worker/meson.build	(date 1750561469120)
+@@ -21,6 +21,7 @@
+     proxy = executable(mojom['name'] + '_ipa_proxy', worker,
+                        install : true,
+                        install_dir : proxy_install_dir,
++                       install_tag: 'ipa-proxy',
+                        dependencies : libcamera_private)
+ endforeach
+ 
